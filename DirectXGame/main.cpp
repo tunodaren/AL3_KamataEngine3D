@@ -94,7 +94,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	// 各種解放
-	SafeDelete(gameScene);
+	/*SafeDelete(gameScene);*/
+	delete gameScene;
+	//Model::StaticFinalize();
 	audio->Finalize();
 	// ImGui解放
 	imguiManager->Finalize();
