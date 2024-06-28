@@ -17,6 +17,8 @@ GameScene::~GameScene() {
 	worldTransformBlocks_.clear();
 
 	delete debugCamera_;
+
+	delete modelSkydom_;
 }
 
 void GameScene::Initialize() {
@@ -30,6 +32,7 @@ void GameScene::Initialize() {
 	// 3Dモデルの生成
 	model_ = Model::Create();
 	modelBlock_ = Model::Create();
+	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// ビュープロジェクションの初期化
@@ -40,6 +43,9 @@ void GameScene::Initialize() {
 	// 自キャラの初期化
 	player_->Initialize(model_, textureHandle_, &viewProjection_);
 
+	//
+	skydom_ = new Skydome();
+	skydom_->Initialize(model_,&viewProjection_);
 
 	// 要素数
 	const uint32_t kNumBlockVirtical = 10;
@@ -101,6 +107,9 @@ void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
 
+	//
+	skydom_->Update();
+
 	// 縦横ブロック更新
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
@@ -145,6 +154,9 @@ void GameScene::Draw() {
 
 	// 自キャラの描画
 //	player_->Draw();
+
+	//
+	skydom_->Draw();
 
 	//縦横ブロック描画
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
