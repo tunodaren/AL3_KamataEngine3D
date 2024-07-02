@@ -29,10 +29,12 @@ void GameScene::Initialize() {
 
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("cube/cube.jpg");
+
 	// 3Dモデルの生成
 	model_ = Model::Create();
 	modelBlock_ = Model::Create();
 	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
+
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// ビュープロジェクションの初期化
@@ -41,11 +43,11 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_, &viewProjection_);
+	player_->Initialize(modelSkydom_, textureHandle_, &viewProjection_);
 
 	//
 	skydom_ = new Skydome();
-	skydom_->Initialize(model_,&viewProjection_);
+	skydom_->Initialize(modelSkydom_,&viewProjection_);
 
 	// 要素数
 	const uint32_t kNumBlockVirtical = 10;
