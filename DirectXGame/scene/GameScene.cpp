@@ -29,6 +29,7 @@ void GameScene::Initialize() {
 
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("cube/cube.jpg");
+	
 
 	// 3Dモデルの生成
 	model_ = Model::Create();
@@ -43,7 +44,7 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(modelSkydom_, textureHandle_, &viewProjection_);
+	player_->Initialize(model_, textureHandle_, &viewProjection_);
 
 	//
 	skydom_ = new Skydome();
