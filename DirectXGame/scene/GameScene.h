@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "DebugCamera.h"
 #include "Skydome.h"
+#include "MapChipField.h"
 
 #include <vector>
 
@@ -36,6 +37,8 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
+	void GenerateBlocks();
+
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
@@ -45,6 +48,8 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -56,11 +61,14 @@ private: // メンバ変数
 	/// </summary>
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+	uint32_t playertextureHandle_ = 0;
 	// 3Dモデル
 	Model* model_ = nullptr;
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydom_ =nullptr;
+	
 	// ワールドトランスフォーム
+	/*WorldTransform worldTransformSkydome_;*/
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -71,6 +79,10 @@ private: // メンバ変数
 	// スカイドーム
 	Skydome* skydom_ =nullptr;
 
+	//
+	/*MapChipField* mapChipField;*/
+	MapChipField* mapChipField_;
+
 	// 縦横ブロック配列
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
 
@@ -78,4 +90,6 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+
+	/*void GenerateBlocks();*/
 };

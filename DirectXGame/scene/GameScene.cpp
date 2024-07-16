@@ -1,24 +1,32 @@
+#include <cassert>
+#include <cstdint>
 #include "GameScene.h"
 #include "TextureManager.h"
 #include "myMath.h"
-#include <cassert>
+
 
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+
 	delete model_;
+
+	delete modelSkydom_;
+
+    delete player_;	
 
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			delete worldTransformBlock;
+			worldTransformBlock = nullptr;
 		}
 	}
 
 	worldTransformBlocks_.clear();
 
 	delete debugCamera_;
-
-	delete modelSkydom_;
+		
+    delete mapChipField_;
 }
 
 void GameScene::Initialize() {
@@ -26,36 +34,52 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-
-	// ファイル名を指定してテクスチャを読み込む
-	textureHandle_ = TextureManager::Load("cube/cube.jpg");
 	
-
-	// 3Dモデルの生成
-	model_ = Model::Create();
-	modelBlock_ = Model::Create();
-	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
-
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 
+	// ファイル名を指定してテクスチャを読み込む
+	textureHandle_ = TextureManager::Load("cube/cube.jpg");
+	playertextureHandle_ = TextureManager::Load("mario.jpg");
+
+	// 3Dモデルの生成
+	model_ = Model::Create();
+	modelBlock_ = Model::CreateFromOBJ("block",true);
+	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
+
+
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_, &viewProjection_);
+	player_->Initialize(modelSkydom_, playertextureHandle_, &viewProjection_);
+
+	/*viewProjection_.Initialize();*/
 
 	//
 	skydom_ = new Skydome();
 	skydom_->Initialize(modelSkydom_,&viewProjection_);
 
+
+	mapChipField_ = new MapChipField;
+	mapChipField_->LoadMapChipCsv("Resources/map.csv");
+
+
+	GenerateBlocks();
+
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280,720);
+}
+
+void GameScene::GenerateBlocks() {
+
 	// 要素数
-	const uint32_t kNumBlockVirtical = 10;
-	const uint32_t kNumBlockHorizontal = 20;
+	 uint32_t kNumBlockVirtical = mapChipField_->GetNumBlockVirtical();
+	 uint32_t kNumBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
 	// ブロック1個分の横幅
-	const float kBlockWidth = 2.0f;
-	const float kBlockHeight = 2.0f;
+	/*const float kBlockWidth = 2.0f;
+	const float kBlockHeight = 2.0f;*/
 	// 要素数を変更する
 	worldTransformBlocks_.resize(kNumBlockVirtical);
 
@@ -64,7 +88,7 @@ void GameScene::Initialize() {
 		worldTransformBlocks_[i].resize(kNumBlockHorizontal);
 	}
 
-	for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
+	/*for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
 			for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
 				if (j % 2 == (i%2)) {
 					worldTransformBlocks_[i][j] = new WorldTransform();
@@ -75,22 +99,35 @@ void GameScene::Initialize() {
 					worldTransformBlocks_[i][j] = nullptr;
 				}
 			}
+	}*/
+
+	for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
+			for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
+				if (mapChipField_->GetMapChipTypeByIndex(j,i) == MapChipType::kBlock) {
+					WorldTransform* worldTransform = new WorldTransform();
+					worldTransform->Initialize();
+					worldTransformBlocks_[i][j] = worldTransform;
+					worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j,i);
+				} /*else {
+					worldTransformBlocks_[i][j] = nullptr;
+				}*/
+			}
 	}
 
-	// デバッグカメラの生成
-	debugCamera_ = new DebugCamera(1280,720);
-}
+
+	}
 
 void GameScene::Update() {
 
-//#ifdef _DEBUG
-//#endif
 
+
+//#ifdef _DEBUG#endif
 	if (input_->TriggerKey(DIK_SPACE)) {
-		if (isDebugCameraActive_ == true)
+		isDebugCameraActive_ = !isDebugCameraActive_;
+		/*if (isDebugCameraActive_ == true)
 			isDebugCameraActive_ = false;
 		else
-			isDebugCameraActive_ = true;
+			isDebugCameraActive_ = true;*/
 	}
 
 
@@ -121,8 +158,21 @@ void GameScene::Update() {
 
 			// アフィン変換行列の作成
 			worldTransformBlockYoko->UpdateMatrix();
+
+			worldTransformBlockYoko->TransferMatrix();
 		}
 	}
+
+	//// 縦横ブロック更新
+	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+	//	for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+	//		if (!worldTransformBlockYoko)
+	//			continue;
+
+	//		// アフィン変換行列の作成
+	//		worldTransformBlockYoko->UpdateMatrix();
+	//	}
+	//}
 }
 
 
@@ -153,15 +203,18 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
-
+	/*model_->Draw(worldTransform_, viewProjection_, textureHandle_);*/
+	modelSkydom_->Draw(worldTransform_,viewProjection_);
 	// 自キャラの描画
-//	player_->Draw();
+	player_->Draw();
 
 	//
-	skydom_->Draw();
+	/*skydom_->Draw();*/
 
-	//縦横ブロック描画
+	//
+	/*mapChipField_->Draw();*/
+
+	// 縦横ブロック描画
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
 			if (!worldTransformBlockYoko)
@@ -170,6 +223,16 @@ void GameScene::Draw() {
 			modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
 		}
 	}
+
+	////縦横ブロック描画
+	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+	//	for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+	//		if (!worldTransformBlockYoko)
+	//			continue;
+
+	//		modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
+	//	}
+	//}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
