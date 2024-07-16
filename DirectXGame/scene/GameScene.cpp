@@ -11,6 +11,8 @@ GameScene::~GameScene() {
 
 	delete model_;
 
+	/*delete modelPlayer_;*/
+
 	delete modelSkydom_;
 
     delete player_;	
@@ -44,16 +46,20 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("cube/cube.jpg");
 	playertextureHandle_ = TextureManager::Load("mario.jpg");
 
-	// 3Dモデルの生成
+	// 3Dモデルの生成 
+	/*modelPlayer_ = Model::CreateFromOBJ("player",true);*/
 	model_ = Model::Create();
 	modelBlock_ = Model::CreateFromOBJ("block",true);
 	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
 
-
 	// 自キャラの生成
 	player_ = new Player();
+
+	//座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(2,18);
+
 	// 自キャラの初期化
-	player_->Initialize(modelSkydom_, playertextureHandle_, &viewProjection_);
+	player_->Initialize(playerPosition,&viewProjection_);
 
 	/*viewProjection_.Initialize();*/
 
@@ -64,6 +70,7 @@ void GameScene::Initialize() {
 
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/map.csv");
+
 
 
 	GenerateBlocks();
@@ -121,7 +128,8 @@ void GameScene::Update() {
 
 
 
-//#ifdef _DEBUG#endif
+//#ifdef _DEBUG
+//#endif
 	if (input_->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		/*if (isDebugCameraActive_ == true)

@@ -64,6 +64,7 @@ private: // メンバ変数
 	uint32_t playertextureHandle_ = 0;
 	// 3Dモデル
 	Model* model_ = nullptr;
+	Model* modelPlayer_ = nullptr;
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydom_ =nullptr;
 	
