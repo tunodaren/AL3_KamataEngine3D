@@ -1,6 +1,6 @@
 #pragma once
-#include "ViewProjection.h"
-#include "myMath.h"
+#include <ViewProjection.h>
+//#include "myMath.h"
 //#include "Player.h"
 
 // 前方宣言

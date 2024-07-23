@@ -1,14 +1,12 @@
 #include "CameraController.h"
+#include "myMath.h"
 #include "Player.h"
 #include <algorithm>
 
 /// 初期化
 void CameraController::Initialize() { 
 	viewProjection_.Initialize();
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 }
 
 /// 更新
