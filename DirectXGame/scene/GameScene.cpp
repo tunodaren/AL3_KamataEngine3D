@@ -1,8 +1,8 @@
-#include <cassert>
-#include <cstdint>
 #include "GameScene.h"
 #include "TextureManager.h"
-#include "myMath.h"
+#include <cassert>
+#include <cstdint>
+
 
 
 GameScene::GameScene() {}
@@ -29,6 +29,8 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 		
     delete mapChipField_;
+
+	delete cameraController;
 }
 
 void GameScene::Initialize() {
@@ -71,12 +73,21 @@ void GameScene::Initialize() {
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/map.csv");
 
-
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280,720);
 
 	GenerateBlocks();
 
-	// デバッグカメラの生成
-	debugCamera_ = new DebugCamera(1280,720);
+	cameraController = new CameraController();
+	cameraController->Initialize();
+	cameraController->SetTarget(player_);
+	cameraController->Reset();
+
+	CameraController::Rect cameraArea = {12.0f,100-12.0f,6.0f,6.0f};
+	cameraController->SetMovableArea(cameraArea);
+
+
+
 }
 
 void GameScene::GenerateBlocks() {
@@ -127,9 +138,8 @@ void GameScene::GenerateBlocks() {
 void GameScene::Update() {
 
 
+#ifdef _DEBUG
 
-//#ifdef _DEBUG
-//#endif
 	if (input_->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		/*if (isDebugCameraActive_ == true)
@@ -137,26 +147,35 @@ void GameScene::Update() {
 		else
 			isDebugCameraActive_ = true;*/
 	}
+#endif
 
-
+	cameraController->Update();
 	// カメラ処理
 	if (isDebugCameraActive_) {
 		// デバッグカメラの更新
 		debugCamera_->Update();
+		cameraController->Update();
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		// ビュープロジェクション行列の転送
 		viewProjection_.TransferMatrix();
 	} else {
+
+		viewProjection_.matView = cameraController->GetViewProjection().matView;
+		viewProjection_.matProjection = cameraController->GetViewProjection().matProjection;
 		// ビュープロジェクション行列の更新と転送
-		viewProjection_.UpdateMatrix();
+		viewProjection_.TransferMatrix();
+		/*viewProjection_.UpdateMatrix();*/
 	}
+
 
 	// 自キャラの更新
 	player_->Update();
 
 	//
 	skydom_->Update();
+
+	
 
 	// 縦横ブロック更新
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {

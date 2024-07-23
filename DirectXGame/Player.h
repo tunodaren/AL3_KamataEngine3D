@@ -1,6 +1,10 @@
+#pragma once
+
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Easing.h"
+#include"myMath.h"
 
 
 /// <summary>
@@ -30,6 +34,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	const Vector3& GetVelocity() const { return velocity_;}
+	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -41,6 +47,7 @@ private:
 	ViewProjection* viewProjection_ = nullptr;
 
 	Vector3 velocity_ = {};
+
 
 	static inline const float kAcceleration = 0.01f;
 	static inline const float kAttenuation = 0.01f;

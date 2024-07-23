@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "Audio.h"
 #include "DirectXCommon.h"
 #include "Input.h"
@@ -11,8 +12,8 @@
 #include "DebugCamera.h"
 #include "Skydome.h"
 #include "MapChipField.h"
+#include "CameraController.h"
 
-#include <vector>
 
 
 
@@ -37,8 +38,6 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
-	void GenerateBlocks();
-
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
@@ -49,7 +48,8 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
-	
+
+	void GenerateBlocks();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -66,7 +66,7 @@ private: // メンバ変数
 	Model* model_ = nullptr;
 	Model* modelPlayer_ = nullptr;
 	Model* modelBlock_ = nullptr;
-	Model* modelSkydom_ =nullptr;
+	Model* modelSkydom_ = nullptr;
 	
 	// ワールドトランスフォーム
 	/*WorldTransform worldTransformSkydome_;*/
@@ -81,8 +81,9 @@ private: // メンバ変数
 	Skydome* skydom_ =nullptr;
 
 	//
-	/*MapChipField* mapChipField;*/
 	MapChipField* mapChipField_;
+
+	
 
 	// 縦横ブロック配列
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
@@ -91,6 +92,9 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+
+	CameraController* cameraController = nullptr;
+
 
 	/*void GenerateBlocks();*/
 };
