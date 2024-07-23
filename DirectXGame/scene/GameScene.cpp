@@ -2,7 +2,10 @@
 #include "TextureManager.h"
 #include <cassert>
 #include <cstdint>
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 
 GameScene::GameScene() {}
@@ -73,11 +76,17 @@ void GameScene::Initialize() {
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/map.csv");
 
+<<<<<<< Updated upstream
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280,720);
 
 	GenerateBlocks();
 
+=======
+	GenerateBlocks();
+
+
+>>>>>>> Stashed changes
 	cameraController = new CameraController();
 	cameraController->Initialize();
 	cameraController->SetTarget(player_);
@@ -87,7 +96,12 @@ void GameScene::Initialize() {
 	cameraController->SetMovableArea(cameraArea);
 
 
+<<<<<<< Updated upstream
 
+=======
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280,720);
+>>>>>>> Stashed changes
 }
 
 void GameScene::GenerateBlocks() {
@@ -140,6 +154,11 @@ void GameScene::Update() {
 
 #ifdef _DEBUG
 
+<<<<<<< Updated upstream
+=======
+#ifdef _DEBUG
+
+>>>>>>> Stashed changes
 	if (input_->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		/*if (isDebugCameraActive_ == true)
