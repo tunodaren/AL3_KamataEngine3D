@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Audio.h"
 #include "DirectXCommon.h"
 #include "Input.h"
@@ -77,13 +78,7 @@ private: // メンバ変数
 	// 自キャラ
 	Player* player_ = nullptr;
 
-	// スカイドーム
-	Skydome* skydom_ =nullptr;
 
-	//
-	MapChipField* mapChipField_;
-
-	
 
 	// 縦横ブロック配列
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
@@ -93,8 +88,13 @@ private: // メンバ変数
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
 
-	CameraController* cameraController = nullptr;
+	// スカイドーム
+	Skydome* skydom_ =nullptr;
 
+	//マップチップフィールド
+	MapChipField* mapChipField_ = nullptr;
+
+	CameraController* cameraController = nullptr;
 
 	/*void GenerateBlocks();*/
 };

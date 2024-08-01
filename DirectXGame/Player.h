@@ -3,9 +3,9 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Easing.h"
-#include"myMath.h"
 
+
+class MapChipField;
 
 /// <summary>
 /// 自キャラ
@@ -17,6 +17,15 @@ public:
 		kRight,
 		kLeft,
 	};
+
+	enum Corner {
+		kRightBottom, // 右下
+		kLeftBottom,  // 左下
+		kRightTop,    // 右上
+		kLeftTop,     // 左上
+		kNumCorner // 要素数
+	};
+
 
 	/// <summary>
 	/// 初期化
@@ -34,9 +43,26 @@ public:
 	/// </summary>
 	void Draw();
 
-	const Vector3& GetVelocity() const { return velocity_;}
 	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
+
+	const Vector3& GetVelocity() const { return velocity_;}
+
+	void SetMapChipField(MapChipField* mapChipField){mapChipField_ = mapChipField;}
+
+	//移動
+	void InputMove();
+
+
+
 private:
+
+	struct CollisionMapInfo {
+		bool ceiling = false;
+		bool landing = false;
+		bool hitWall = false;
+		Vector3 move;
+	};
+
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// モデル
@@ -48,6 +74,8 @@ private:
 
 	Vector3 velocity_ = {};
 
+	//マップチップによるフィールド
+	MapChipField* mapChipField_ = nullptr;
 
 	static inline const float kAcceleration = 0.01f;
 	static inline const float kAttenuation = 0.01f;
@@ -74,6 +102,24 @@ private:
 	static inline const float kLimitFallSpeed = 0.2f;
 	// ジャンプ初速（上方向）
 	static inline const float kJumpAcceleration = 0.7f;
+
+	static inline const float kWidth = 0.8f;
+	static inline const float kHeight = 0.8f;
+
+	static inline const float kBlank = 0.04f;
+
+
+    
+    void CheckMapCollision(CollisionMapInfo& info);
+	void CheckMapCollisionUp(CollisionMapInfo& info);
+	//void CheckMapCollisionDown(CollisionMapInfo& info);
+	//void CheckMapCollisionRight(CollisionMapInfo& info);
+	//void CheckMapCollisionLeft(CollisionMapInfo& info);
+	//void UpdateOnGround(const CollisionMapInfo& info);
+	//void AnimateTurn();
+
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+
 };
 
 ///// <summary>

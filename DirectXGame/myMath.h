@@ -34,6 +34,8 @@ const Vector3 operator*(const Vector3& v, float s);
 
 
 
+
+
 //const float PI = 3.141592654f;
 //Vector3 operator+(const Vector3& v);
 //Vector3 operator-(const Vector3& v);

@@ -1,8 +1,8 @@
 #include "GameScene.h"
 #include "TextureManager.h"
+#include "myMath.h"
+#include "CameraController.h"
 #include <cassert>
-#include <cstdint>
-
 
 
 GameScene::GameScene() {}
@@ -10,12 +10,6 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 
 	delete model_;
-
-	/*delete modelPlayer_;*/
-
-	delete modelSkydom_;
-
-    delete player_;	
 
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -25,12 +19,17 @@ GameScene::~GameScene() {
 	}
 
 	worldTransformBlocks_.clear();
+	/*delete modelPlayer_;*/
 
 	delete debugCamera_;
-		
-    delete mapChipField_;
 
+	delete modelSkydom_;
+    
+	delete mapChipField_;
+    
 	delete cameraController;
+	
+	delete player_;	
 }
 
 void GameScene::Initialize() {
@@ -54,33 +53,36 @@ void GameScene::Initialize() {
 	modelBlock_ = Model::CreateFromOBJ("block",true);
 	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
 
+
+	mapChipField_ = new MapChipField;
+	mapChipField_->LoadMapChipCsv("Resources/map.csv");
+
 	// 自キャラの生成
 	player_ = new Player();
 
 	//座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(2,18);
+	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(1,18);
 
 	// 自キャラの初期化
 	player_->Initialize(playerPosition,&viewProjection_);
 
-	/*viewProjection_.Initialize();*/
+	player_->SetMapChipField(mapChipField_);
+
+	viewProjection_.Initialize();
 
 	//
 	skydom_ = new Skydome();
 	skydom_->Initialize(modelSkydom_,&viewProjection_);
 
 
-	mapChipField_ = new MapChipField;
-	mapChipField_->LoadMapChipCsv("Resources/map.csv");
+	
 
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280,720);
 
 	GenerateBlocks();
-
-
-	GenerateBlocks();
+  /*GenerateBlocks();*/
 
 
 
@@ -184,7 +186,7 @@ void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
 
-	//
+	//天球の更新
 	skydom_->Update();
 
 	
@@ -195,10 +197,16 @@ void GameScene::Update() {
 			if (!worldTransformBlockYoko)
 				continue;
 
-			// アフィン変換行列の作成
-			worldTransformBlockYoko->UpdateMatrix();
+            // アフィン変換行列の作成
+			worldTransformBlockYoko->matWorld_ = 
+			MakeAffineMatrix(worldTransformBlockYoko->scale_,
+		    worldTransformBlockYoko->rotation_,
+			worldTransformBlockYoko->translation_);
 
+			//定数バッファに転送
 			worldTransformBlockYoko->TransferMatrix();
+			/*worldTransformBlockYoko->UpdateMatrix();
+			worldTransformBlockYoko->TransferMatrix();*/
 		}
 	}
 
@@ -263,15 +271,6 @@ void GameScene::Draw() {
 		}
 	}
 
-	////縦横ブロック描画
-	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
-	//	for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
-	//		if (!worldTransformBlockYoko)
-	//			continue;
-
-	//		modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
-	//	}
-	//}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

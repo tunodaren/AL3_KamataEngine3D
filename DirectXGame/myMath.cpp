@@ -1,6 +1,7 @@
 #include "myMath.h"
 #include "Vector3.h"
 #include "GameScene.h"
+#include <Easing.h>
 
 // 行列の掛け算
 Matrix4x4 MatrixMultiply(Matrix4x4& m1, Matrix4x4& m2) {
@@ -107,6 +108,8 @@ const Vector3 operator*(const Vector3& v, float s) {
 	Vector3 temp(v);
 	return temp *= s;
 }
+
+
 
 
 //Vector3 operator+(const Vector3& v) { return v; }
