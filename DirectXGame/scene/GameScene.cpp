@@ -61,7 +61,7 @@ void GameScene::Initialize() {
 	player_ = new Player();
 
 	//座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(1,18);
+	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(2,17);
 
 	// 自キャラの初期化
 	player_->Initialize(playerPosition,&viewProjection_);

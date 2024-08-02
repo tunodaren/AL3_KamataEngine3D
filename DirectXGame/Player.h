@@ -108,15 +108,17 @@ private:
 
 	static inline const float kBlank = 0.04f;
 
+	static inline const float kAttenuationLanding = 0.5f;
 
+	static inline const float kGroundSearchHeight = 0.06f;
     
     void CheckMapCollision(CollisionMapInfo& info);
 	void CheckMapCollisionUp(CollisionMapInfo& info);
-	//void CheckMapCollisionDown(CollisionMapInfo& info);
-	//void CheckMapCollisionRight(CollisionMapInfo& info);
-	//void CheckMapCollisionLeft(CollisionMapInfo& info);
-	//void UpdateOnGround(const CollisionMapInfo& info);
-	//void AnimateTurn();
+    void CheckMapCollisionDown(CollisionMapInfo& info);
+	void CheckMapCollisionRight(CollisionMapInfo& info);
+	void CheckMapCollisionLeft(CollisionMapInfo& info);
+	void UpdateOnGround(const CollisionMapInfo& info);
+	void AnimateTurn();
 
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
 
