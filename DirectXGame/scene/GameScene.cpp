@@ -166,7 +166,7 @@ void GameScene::Update() {
 
 #ifdef _DEBUG
 
->>>>>>> Stashed changes
+
 	if (input_->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		/*if (isDebugCameraActive_ == true)
