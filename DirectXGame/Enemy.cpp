@@ -13,7 +13,7 @@
 
 
 void Enemy::Initialize(Model*model, ViewProjection* viewProjection,const Vector3& position) {
-	assert(model);
+	/*assert(model);*/
 	model_ = model;
 
 // ワールド変換の初期化
