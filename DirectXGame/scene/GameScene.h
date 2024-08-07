@@ -10,6 +10,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "DebugCamera.h"
 #include "Skydome.h"
 #include "MapChipField.h"
@@ -78,7 +79,8 @@ private: // メンバ変数
 	// 自キャラ
 	Player* player_ = nullptr;
 
-
+	//敵キャラ
+	Enemy* enemy_ = nullptr;
 
 	// 縦横ブロック配列
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;

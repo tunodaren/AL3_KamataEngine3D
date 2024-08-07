@@ -32,7 +32,8 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vecto
     Matrix4x4 ScallMat,
               RotateMat,RotateMatX,RotateMatY,RotateMatZ,
               TranslateMat,
-              returnMat;
+              returnMat
+              /*,RotateMatAll , ansMat*/;
 
     // スケール行列作成
     ScallMat = {scale.x, 0, 0, 0,
@@ -70,6 +71,12 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vecto
     // スケール＊回転＊平行移動をワールド変換行列に
     returnMat = MatrixMultiply(ScallMat, RotateMat);
     returnMat = MatrixMultiply(returnMat, TranslateMat);
+
+    //X軸回転*Y軸回転で回転行列を合成
+    Matrix4x4 RotateMatAll = MatrixMultiply(RotateMatX,RotateMatY);
+
+    //回転*平行で回転行列だけをワールド変換行列に
+    Matrix4x4 ansMat = MatrixMultiply(RotateMatAll,TranslateMat);
 
     return returnMat;
 }
