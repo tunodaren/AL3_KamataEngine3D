@@ -31,7 +31,11 @@ GameScene::~GameScene() {
 	
 	delete player_;	
 
-	delete enemy_;
+	/*delete enemy_;*/
+	/*for (Enemy* enemy : enemies_) {
+		delete enemy;
+	}*/
+	delete newEnemy_;
 }
 
 void GameScene::Initialize() {
@@ -63,21 +67,35 @@ void GameScene::Initialize() {
 	player_ = new Player();
 
 	//敵キャラの生成
-	enemy_ = new Enemy();
+	/*enemy_ = new Enemy();*/
+	/*for(int32_t i = 0; i < 3; ++i){
+		Enemy* newEnemy = new Enemy();
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(30, 16+i);
+		newEnemy->Initialize(modelEnemy_,&viewProjection_,enemyPosition);
+		enemies_.push_back(newEnemy);
+	}*/
+
+	newEnemy_ = new Enemy();
+	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(30, 18);
+	newEnemy_->Initialize(modelEnemy_, &viewProjection_, enemyPosition);
+
+	enemies_.push_back(newEnemy_);
+
+
 
 	//座標をマップチップ番号で指定(プレイヤー)
 	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(2,18);
 
 	//座標をマップチップ番号で指定(敵)
-	Vector3 enemyPosition = mapChipField_ ->GetMapChipPositionByIndex(30,18);
+	/*Vector3 enemyPosition = mapChipField_ ->GetMapChipPositionByIndex(30,18);*/
 
 	// 自キャラの初期化
 	player_->Initialize(playerPosition,&viewProjection_);
 	player_->SetMapChipField(mapChipField_);
 
 	// 敵キャラの初期化
-	enemy_->Initialize(enemyPosition,&viewProjection_);
-	enemy_->SetMapChipField(mapChipField_);
+	/*enemy_->Initialize(enemyPosition,&viewProjection_);*/
+	/*enemy_->SetMapChipField(mapChipField_);*/
 
 
 
@@ -203,7 +221,12 @@ void GameScene::Update() {
 	skydom_->Update();
 
 	// 敵キャラの更新
-	enemy_->Update();
+	/*enemy_->Update();*/
+
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
+	newEnemy_->Update();
 
 	// 縦横ブロック更新
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
@@ -223,6 +246,9 @@ void GameScene::Update() {
 			worldTransformBlockYoko->TransferMatrix();*/
 		}
 	}
+
+	//　全ての当たり判定を行う
+	CheckAllCollisions();
 
 	//// 縦横ブロック更新
 	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
@@ -270,7 +296,9 @@ void GameScene::Draw() {
 	player_->Draw();
 
 	//敵の描画
-	enemy_->Draw();
+	/*enemy_->Draw();*/
+	newEnemy_->Draw();
+	newEnemy_->Draw();
 
 	//
 	/*skydom_->Draw();*/
@@ -305,4 +333,30 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 //#pragma endregion
+
+}
+
+
+void GameScene::CheckAllCollisions() {
+
+	//判定対象1と2の座標
+	AABB aabb1, aabb2;
+
+	//自キャラ
+	aabb1 = player_->GetAABB();
+
+	for (Enemy* enemy : enemies_) {
+		aabb2 = enemy->GetAABB();
+
+		if(IsCollision(aabb1,aabb2)){
+
+			player_->OnCollision(enemy);
+
+			enemy->OnCollision(player_);
+
+		}
+
+	}
+
+
 }

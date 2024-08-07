@@ -3,9 +3,11 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "AABB.h"
 
 
 class MapChipField;
+class Enemy;
 
 /// <summary>
 /// 自キャラ
@@ -52,7 +54,12 @@ public:
 	//移動
 	void InputMove();
 
+	//ワールド座標を取得
+	Vector3 GetWorldPosition();
 
+	AABB GetAABB();
+
+	void OnCollision(const Enemy* enemy);
 
 private:
 

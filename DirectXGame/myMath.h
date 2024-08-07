@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
+#include "AABB.h"
 
 
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
@@ -32,6 +33,8 @@ Vector3& operator*=(Vector3& v, float s);
 // Vector3の掛け算
 const Vector3 operator*(const Vector3& v, float s);
 
+
+bool IsCollision(const AABB& aabb1,const AABB& aabb2);
 
 
 

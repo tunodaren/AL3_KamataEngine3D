@@ -116,7 +116,11 @@ const Vector3 operator*(const Vector3& v, float s) {
 	return temp *= s;
 }
 
-
+bool IsCollision(const AABB& aabb1, const AABB& aabb2) {
+    return (aabb1.max.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) && //x軸 
+           (aabb1.max.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) && //y軸
+           (aabb1.max.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z);  // z軸
+}
 
 
 //Vector3 operator+(const Vector3& v) { return v; }

@@ -53,6 +53,9 @@ public: // メンバ関数
 
 	void GenerateBlocks();
 
+	//　全ての当たり判定を行う
+	void CheckAllCollisions();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -69,6 +72,7 @@ private: // メンバ変数
 	Model* modelPlayer_ = nullptr;
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydom_ = nullptr;
+	Model* modelEnemy_ = nullptr;
 	
 	// ワールドトランスフォーム
 	/*WorldTransform worldTransformSkydome_;*/
@@ -80,7 +84,9 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 
 	//敵キャラ
-	Enemy* enemy_ = nullptr;
+	Enemy* newEnemy_ = nullptr;
+	/*Enemy* enemy_ = nullptr;*/
+	std::list<Enemy*> enemies_;
 
 	// 縦横ブロック配列
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
@@ -97,6 +103,5 @@ private: // メンバ変数
 	MapChipField* mapChipField_ = nullptr;
 
 	CameraController* cameraController = nullptr;
-
 	/*void GenerateBlocks();*/
 };

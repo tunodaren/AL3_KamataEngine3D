@@ -81,6 +81,28 @@ void Player::Update() {
 
 }
 
+Vector3 Player::GetWorldPosition() { 
+	Vector3 worldPos;
+	// ワールド行列の平行移動成分を取得(ワールド座標)
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+	return worldPos;
+}
+
+AABB Player::GetAABB() { 
+
+	Vector3 worldPos = GetWorldPosition(); 
+
+	AABB aabb;
+
+	aabb.min = {worldPos.x - kWidth / 2.0f, worldPos.y - kHeight / 2.0f, worldPos.z - kWidth / 2.0f};
+	aabb.max = {worldPos.x + kWidth / 2.0f, worldPos.y + kHeight / 2.0f, worldPos.z + kWidth / 2.0f};
+
+	return aabb;
+}
+
+
 void Player::CheckMapCollision(CollisionMapInfo& info) {
 
 	CheckMapCollisionUp(info);
@@ -496,4 +518,11 @@ void Player::Draw() {
 
 	// 3Dモデルを描画
 	model_->Draw(worldTransform_, *viewProjection_);
+}
+
+void Player::OnCollision(const Enemy* enemy) {
+	(void)enemy;
+	velocity_ += Vector3(velocity_.x += 0,
+			             velocity_.y += kJumpAcceleration,
+			             velocity_.z += 0);
 }

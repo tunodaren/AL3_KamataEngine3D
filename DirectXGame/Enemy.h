@@ -1,11 +1,13 @@
 #pragma once
 
+#include"AABB.h"
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 
 
 class MapChipField;
+class Player;
 
 /// <summary>
 /// 自キャラ
@@ -14,7 +16,7 @@ class Enemy {
 public:
 	
 
-    void Initialize(const Vector3& position, ViewProjection *viewProjection);
+    void Initialize(Model*model, ViewProjection* viewProjection,const Vector3& position);
 
 	/// <summary>
 	/// 更新
@@ -29,7 +31,12 @@ public:
 
 	void SetMapChipField(MapChipField* mapChipField){mapChipField_ = mapChipField;}
 
+	void OnCollision(const Player* player);
 
+	//ワールド座標を取得
+	Vector3 GetWorldPosition();
+
+	AABB GetAABB();
 
 private:
 
@@ -61,5 +68,7 @@ private:
 	//経過
 	float walkTimer_ = 0.0f;
 
+	static inline const float kWidth = 0.8f;
+	static inline const float kHeight = 0.8f;
 
 };
