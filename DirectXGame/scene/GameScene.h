@@ -52,12 +52,25 @@ public: // メンバ関数
 	void Draw();
 
 
-	void GenerateBlocks();
-
 	//　全ての当たり判定を行う
 	void CheckAllCollisions();
 
+	
+	     
+
 private: // メンバ変数
+
+	//ゲームのフェイズ(型)
+	enum class Phase {
+		kplay, //ゲームプレイ
+		kDeath,
+	};
+
+	//ゲームの現在フェイズ
+	Phase phase_;
+
+	DeathParticles*deathParticles_ = nullptr;
+
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
@@ -108,6 +121,13 @@ private: // メンバ変数
 
 	DeathParticles* dethParticles_ = nullptr;
 
+	void ChangePhase();
 
+	void GenerateBlocks();
+	
+	void UpdateCamera();
+
+	void UpdateBlocks();
+	
 	/*void GenerateBlocks();*/
 };

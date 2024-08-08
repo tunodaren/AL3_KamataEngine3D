@@ -83,7 +83,8 @@ void GameScene::Initialize() {
 
 	enemies_.push_back(newEnemy_);
 
-
+	//ゲームプレイフェイズ
+	phase_ = Phase::kplay;
 
 	//座標をマップチップ番号で指定(プレイヤー)
 	Vector3 playerPosition = mapChipField_ ->GetMapChipPositionByIndex(2,18);
@@ -109,8 +110,8 @@ void GameScene::Initialize() {
 
 
 	//仮の生成処理.後で消す.
-	dethParticles_ = new DeathParticles;
-	dethParticles_ ->Initialize(modelDeathParticle_,&viewProjection_,playerPosition);
+	/*dethParticles_ = new DeathParticles;
+	dethParticles_ ->Initialize(modelDeathParticle_,&viewProjection_,playerPosition);*/
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280,720);
@@ -133,6 +134,229 @@ void GameScene::Initialize() {
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280,720);
+
+}
+
+
+
+
+
+void GameScene::Update() {
+
+
+	ChangePhase();
+
+
+	switch (phase_){
+		case Phase::kplay:
+			//ゲームプレイフェーズの処理
+
+	//天球の更新
+	        /*skydom_->Update();*/
+			worldTransform_.UpdateMatrix();
+
+	// 自キャラの更新
+			player_->Update();
+
+	
+    // 敵キャラの更新
+			/*enemy_->Update();*/
+			for (Enemy* enemy : enemies_) {
+				enemy->Update();
+			}
+			newEnemy_->Update();
+
+	// カメラ処理
+			
+			UpdateCamera();
+
+	//ブロックの更新
+			UpdateBlocks();
+    
+
+	//全ての当たり判定を行う
+	         CheckAllCollisions();
+				AABB aabb1, aabb2;
+
+	////自キャラ
+	aabb1 = player_->GetAABB();
+
+	for (Enemy* enemy : enemies_) {
+
+		aabb2 = enemy->GetAABB();
+
+		if(IsCollision(aabb1,aabb2)){
+
+			player_->OnCollision(enemy);
+
+			enemy->OnCollision(player_);
+
+		}
+
+	}
+
+
+
+
+			break;
+		case Phase::kDeath:
+			//デス演出フェーズの処理
+
+
+
+	//天球の更新
+	        /*skydom_->Update();*/
+			worldTransform_.UpdateMatrix();
+			
+	// 敵キャラの更新
+			/*enemy_->Update();*/
+			for (Enemy* enemy : enemies_) {
+				enemy->Update();
+			}
+			newEnemy_->Update();
+
+
+	//デスパーティクルが存在するなら
+	        if (dethParticles_) {
+		        dethParticles_->Update();
+	        }
+
+	////カメラコントローラーの更新
+	UpdateCamera();
+
+	// 縦横ブロック更新
+	UpdateBlocks();
+
+			break;
+	}
+
+
+	//// 縦横ブロック更新
+	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+	//	for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+	//		if (!worldTransformBlockYoko)
+	//			continue;
+
+	//		// アフィン変換行列の作成
+	//		worldTransformBlockYoko->UpdateMatrix();
+	//	}
+	//}
+}
+
+
+
+
+void GameScene::Draw() {
+
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+#pragma region 背景スプライト描画
+	// 背景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに背景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+	// 深度バッファクリア
+	dxCommon_->ClearDepthBuffer();
+#pragma endregion
+
+#pragma region 3Dオブジェクト描画
+	// 3Dオブジェクト描画前処理
+	Model::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに3Dオブジェクトの描画処理を追加できる
+	/// </summary>
+	// 3Dモデル描画
+	/*model_->Draw(worldTransform_, viewProjection_, textureHandle_);*/
+	modelSkydom_->Draw(worldTransform_,viewProjection_);
+
+	// 縦横ブロック描画
+	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+			if (!worldTransformBlockYoko)
+				continue;
+
+			modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
+		}
+	}
+
+    // 自キャラの描画
+	if(!player_->IsDead()){
+       
+	player_->Draw();
+	}
+
+
+    //敵の描画
+	/*for(Enemy* enemy : enemies_){
+		enemy->Draw();
+	}*/
+	///*enemy_->Draw();*/
+	newEnemy_->Draw();
+	newEnemy_->Draw();
+
+	//デスパーティクルが存在するなら
+	if (dethParticles_) {
+		dethParticles_->Draw();
+	}
+
+
+	//
+	/*skydom_->Draw();*/
+
+	//
+	/*mapChipField_->Draw();*/
+
+
+	// 3Dオブジェクト描画後処理
+	Model::PostDraw();
+#pragma endregion
+
+#pragma region 前景スプライト描画
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+
+//#pragma endregion
+
+}
+
+void GameScene::ChangePhase() { 
+
+	switch (phase_) {
+		case Phase::kplay:
+			//ゲームプレイフェイズの処理
+
+			if (player_->IsDead()) {
+			// 死亡演出
+			phase_ = Phase::kDeath;
+
+			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+			
+			deathParticles_ = new DeathParticles;
+
+			deathParticles_->Initialize(modelDeathParticle_, &viewProjection_, deathParticlesPosition);
+		}
+
+			break;
+		case Phase::kDeath:
+			//デス演出フェイズの処理
+
+
+			break;
+	}
 
 }
 
@@ -179,13 +403,11 @@ void GameScene::GenerateBlocks() {
 	}
 
 
-	}
-
-void GameScene::Update() {
+}
 
 
-
-#ifdef _DEBUG
+void GameScene::UpdateCamera() {
+	 #ifdef _DEBUG
 
 
 	if (input_->TriggerKey(DIK_SPACE)) {
@@ -197,159 +419,48 @@ void GameScene::Update() {
 	}
 #endif
 
-	cameraController->Update();
-	// カメラ処理
 	if (isDebugCameraActive_) {
-		// デバッグカメラの更新
-		debugCamera_->Update();
-		cameraController->Update();
-		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
-		// ビュープロジェクション行列の転送
-		viewProjection_.TransferMatrix();
+				// デバッグカメラの更新
+				debugCamera_->Update();
+				cameraController->Update();
+				viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+				viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+				// ビュープロジェクション行列の転送
+				viewProjection_.TransferMatrix();
 	} else {
 
-		viewProjection_.matView = cameraController->GetViewProjection().matView;
-		viewProjection_.matProjection = cameraController->GetViewProjection().matProjection;
-		// ビュープロジェクション行列の更新と転送
-		viewProjection_.TransferMatrix();
-		/*viewProjection_.UpdateMatrix();*/
+				viewProjection_.matView = cameraController->GetViewProjection().matView;
+		        viewProjection_.matProjection = cameraController->GetViewProjection().matProjection;
+		        // ビュープロジェクション行列の更新と転送	         
+				viewProjection_.TransferMatrix();
+		        /*viewProjection_.UpdateMatrix();*/
 	}
-
-
-	// 自キャラの更新
-	player_->Update();
-
-	//天球の更新
-	skydom_->Update();
-
-	// 敵キャラの更新
-	/*enemy_->Update();*/
-
-	for (Enemy* enemy : enemies_) {
-		enemy->Update();
-	}
-	newEnemy_->Update();
-
-	//デスパーティクルが存在するなら
-	if (dethParticles_) {
-		dethParticles_->Update();
-	}
-
-	// 縦横ブロック更新
-	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
-			if (!worldTransformBlockYoko)
-				continue;
-
-            // アフィン変換行列の作成
-			worldTransformBlockYoko->matWorld_ = 
-			MakeAffineMatrix(worldTransformBlockYoko->scale_,
-		    worldTransformBlockYoko->rotation_,
-			worldTransformBlockYoko->translation_);
-
-			//定数バッファに転送
-			worldTransformBlockYoko->TransferMatrix();
-			/*worldTransformBlockYoko->UpdateMatrix();
-			worldTransformBlockYoko->TransferMatrix();*/
-		}
-	}
-
-	//　全ての当たり判定を行う
-	CheckAllCollisions();
-
-	//// 縦横ブロック更新
-	//for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
-	//	for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
-	//		if (!worldTransformBlockYoko)
-	//			continue;
-
-	//		// アフィン変換行列の作成
-	//		worldTransformBlockYoko->UpdateMatrix();
-	//	}
-	//}
-}
-
-
-void GameScene::Draw() {
-
-	// コマンドリストの取得
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
-
-#pragma region 背景スプライト描画
-	// 背景スプライト描画前処理
-	Sprite::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに背景スプライトの描画処理を追加できる
-	/// </summary>
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
-	// 深度バッファクリア
-	dxCommon_->ClearDepthBuffer();
-#pragma endregion
-
-#pragma region 3Dオブジェクト描画
-	// 3Dオブジェクト描画前処理
-	Model::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに3Dオブジェクトの描画処理を追加できる
-	/// </summary>
-	// 3Dモデル描画
-	/*model_->Draw(worldTransform_, viewProjection_, textureHandle_);*/
-	modelSkydom_->Draw(worldTransform_,viewProjection_);
-	// 自キャラの描画
-	player_->Draw();
-
-	//敵の描画
-	/*enemy_->Draw();*/
-	newEnemy_->Draw();
-	newEnemy_->Draw();
-
-
-	//デスパーティクルが存在するなら
-	if (dethParticles_) {
-		dethParticles_->Draw();
-	}
-
-	//
-	/*skydom_->Draw();*/
-
-	//
-	/*mapChipField_->Draw();*/
-
-	// 縦横ブロック描画
-	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
-			if (!worldTransformBlockYoko)
-				continue;
-
-			modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
-		}
-	}
-
-
-	// 3Dオブジェクト描画後処理
-	Model::PostDraw();
-#pragma endregion
-
-#pragma region 前景スプライト描画
-	// 前景スプライト描画前処理
-	Sprite::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに前景スプライトの描画処理を追加できる
-	/// </summary>
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
-
-//#pragma endregion
 
 }
 
+void GameScene::UpdateBlocks() {
+
+// 縦横ブロック更新
+	         for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+		          for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+			           if (!worldTransformBlockYoko)
+				           continue;
+ 
+                       // アフィン変換行列の作成
+			           worldTransformBlockYoko->matWorld_ = 
+			           MakeAffineMatrix(worldTransformBlockYoko->scale_,
+		                  worldTransformBlockYoko->rotation_,
+			           worldTransformBlockYoko->translation_);
+			           
+			           //定数バッファに転送
+			           worldTransformBlockYoko->TransferMatrix();
+			           /*worldTransformBlockYoko->UpdateMatrix();
+			           worldTransformBlockYoko->TransferMatrix();*/
+		          }
+	         }
+
+
+}
 
 void GameScene::CheckAllCollisions() {
 
