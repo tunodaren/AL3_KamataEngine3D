@@ -15,6 +15,7 @@
 #include "Skydome.h"
 #include "MapChipField.h"
 #include "CameraController.h"
+#include "DeathParticles.h"
 
 
 
@@ -73,6 +74,7 @@ private: // メンバ変数
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydom_ = nullptr;
 	Model* modelEnemy_ = nullptr;
+	Model* modelDeathParticle_ = nullptr;
 	
 	// ワールドトランスフォーム
 	/*WorldTransform worldTransformSkydome_;*/
@@ -103,5 +105,9 @@ private: // メンバ変数
 	MapChipField* mapChipField_ = nullptr;
 
 	CameraController* cameraController = nullptr;
+
+	DeathParticles* dethParticles_ = nullptr;
+
+
 	/*void GenerateBlocks();*/
 };

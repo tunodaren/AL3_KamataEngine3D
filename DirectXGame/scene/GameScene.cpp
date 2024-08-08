@@ -36,6 +36,8 @@ GameScene::~GameScene() {
 		delete enemy;
 	}*/
 	delete newEnemy_;
+
+	delete modelDeathParticle_;
 }
 
 void GameScene::Initialize() {
@@ -58,7 +60,7 @@ void GameScene::Initialize() {
 	model_ = Model::Create();
 	modelBlock_ = Model::CreateFromOBJ("block",true);
 	modelSkydom_ = Model::CreateFromOBJ("sphere",true);
-
+	modelDeathParticle_ = Model::CreateFromOBJ("deathParticle", true);
 
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/map.csv");
@@ -106,8 +108,9 @@ void GameScene::Initialize() {
 	skydom_->Initialize(modelSkydom_,&viewProjection_);
 
 
-	
-
+	//仮の生成処理.後で消す.
+	dethParticles_ = new DeathParticles;
+	dethParticles_ ->Initialize(modelDeathParticle_,&viewProjection_,playerPosition);
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280,720);
@@ -228,6 +231,11 @@ void GameScene::Update() {
 	}
 	newEnemy_->Update();
 
+	//デスパーティクルが存在するなら
+	if (dethParticles_) {
+		dethParticles_->Update();
+	}
+
 	// 縦横ブロック更新
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
@@ -299,6 +307,12 @@ void GameScene::Draw() {
 	/*enemy_->Draw();*/
 	newEnemy_->Draw();
 	newEnemy_->Draw();
+
+
+	//デスパーティクルが存在するなら
+	if (dethParticles_) {
+		dethParticles_->Draw();
+	}
 
 	//
 	/*skydom_->Draw();*/

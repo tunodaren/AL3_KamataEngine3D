@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "ObjectColor.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -101,6 +102,7 @@ public: // メンバ関数
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
+
 	/// <summary>
 	/// 描画（テクスチャ差し替え）
 	/// </summary>
@@ -110,6 +112,8 @@ public: // メンバ関数
 	void Draw(
 	    const WorldTransform& worldTransform, const ViewProjection& viewProjection,
 	    uint32_t textureHadle);
+
+
 
 	/// <summary>
 	/// メッシュコンテナを取得
