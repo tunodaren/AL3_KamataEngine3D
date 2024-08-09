@@ -23,6 +23,7 @@ void Initialize(Model*model, ViewProjection* viewProjection,const Vector3& posit
 	/// </summary>
 	void Draw();
 
+	bool IsFinished() const { return isFinished_; };
 private:
 
 	// モデル

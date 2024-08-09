@@ -522,7 +522,5 @@ void Player::Draw() {
 
 void Player::OnCollision(const Enemy* enemy) {
 	(void)enemy;
-	velocity_ += Vector3(velocity_.x += 0,
-			             velocity_.y += kJumpAcceleration,
-			             velocity_.z += 0);
+	isDead_ = true;
 }

@@ -1,22 +1,23 @@
 #pragma once
 
-#include <vector>
-
 #include "Audio.h"
+#include "CameraController.h"
 #include "DirectXCommon.h"
+#include "DebugCamera.h"
+#include "DeathParticles.h"
+#include "Enemy.h"
 #include "Input.h"
 #include "Model.h"
+#include "MapChipField.h"
+#include "Player.h"
 #include "Sprite.h"
+#include "Skydome.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player.h"
-#include "Enemy.h"
-#include "DebugCamera.h"
-#include "Skydome.h"
-#include "MapChipField.h"
-#include "CameraController.h"
-#include "DeathParticles.h"
+#include "TitleScene.h"
 
+#include <vector>
+#include <list>
 
 
 
@@ -51,16 +52,19 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
-
-	void GenerateBlocks();
-
-	//　全ての当たり判定を行う
-	void CheckAllCollisions();
+	bool IsFinished()const{return finished_;}
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+
+	enum class Phase {
+		kPlay,
+		kDeath,
+	};
+
+	Phase phase_;
 
 	/// <summary>
 	/// ゲームシーン用
@@ -106,8 +110,15 @@ private: // メンバ変数
 
 	CameraController* cameraController = nullptr;
 
-	DeathParticles* dethParticles_ = nullptr;
+	DeathParticles* deathParticles_ = nullptr;
 
+void ChangePhase();
+void GenerateBlocks();
+void UpdateCamera();
+void UpdateBlocks();
+//　全ての当たり判定を行う
+void CheckAllCollisions();
 
-	/*void GenerateBlocks();*/
+bool finished_ = false;
+
 };

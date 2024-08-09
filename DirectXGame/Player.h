@@ -61,6 +61,9 @@ public:
 
 	void OnCollision(const Enemy* enemy);
 
+	//デスフラグのgetter
+	bool IsDead() const {return isDead_;}
+
 private:
 
 	struct CollisionMapInfo {
@@ -128,6 +131,9 @@ private:
 	void AnimateTurn();
 
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
+
+	//デスフラグ
+	bool isDead_ = false;
 
 };
 
