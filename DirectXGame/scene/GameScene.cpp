@@ -100,7 +100,7 @@ void GameScene::Initialize() {
 	/*enemy_->Initialize(enemyPosition,&viewProjection_);*/
 	/*enemy_->SetMapChipField(mapChipField_);*/
 
-
+	/*deathParticles_ = new DeathParticles();*/
 
 	viewProjection_.Initialize();
 
@@ -176,27 +176,10 @@ void GameScene::Update() {
 
 	//全ての当たり判定を行う
 	         CheckAllCollisions();
-				AABB aabb1, aabb2;
+
+
 
 	////自キャラ
-	aabb1 = player_->GetAABB();
-
-	for (Enemy* enemy : enemies_) {
-
-		aabb2 = enemy->GetAABB();
-
-		if(IsCollision(aabb1,aabb2)){
-
-			player_->OnCollision(enemy);
-
-			enemy->OnCollision(player_);
-
-		}
-
-	}
-
-
-
 
 			break;
 		case Phase::kDeath:
@@ -348,6 +331,7 @@ void GameScene::ChangePhase() {
 			deathParticles_ = new DeathParticles;
 
 			deathParticles_->Initialize(modelDeathParticle_, &viewProjection_, deathParticlesPosition);
+
 		}
 
 			break;
@@ -470,18 +454,19 @@ void GameScene::CheckAllCollisions() {
 	//自キャラ
 	aabb1 = player_->GetAABB();
 
-	for (Enemy* enemy : enemies_) {
-		aabb2 = enemy->GetAABB();
+	/*for (Enemy* enemy : enemies_) {
+    }*/
+		aabb2 = newEnemy_->GetAABB();
 
 		if(IsCollision(aabb1,aabb2)){
 
-			player_->OnCollision(enemy);
+			player_->OnCollision(newEnemy_);
 
-			enemy->OnCollision(player_);
+			newEnemy_->OnCollision(player_);
 
 		}
 
-	}
+	
 
 
 }

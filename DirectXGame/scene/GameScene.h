@@ -55,7 +55,7 @@ public: // メンバ関数
 	//　全ての当たり判定を行う
 	void CheckAllCollisions();
 
-	
+	void ChangePhase();
 	     
 
 private: // メンバ変数
@@ -121,7 +121,6 @@ private: // メンバ変数
 
 	DeathParticles* dethParticles_ = nullptr;
 
-	void ChangePhase();
 
 	void GenerateBlocks();
 	
